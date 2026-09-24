@@ -1,0 +1,1373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GCO Creative Tracker</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF; --surface:#FFFFFF; --surface-2:#F7F7F5; --ink:#1C1810; --ink-soft:#75705E;
+    --line:#EAE6DC; --accent:#EA5A22; --accent-ink:#FFFFFF; --accent-soft:#FDE7DA;
+    --ok:#2E8B57; --ok-soft:#E3F4EA; --warn:#C1861F; --warn-soft:#F7E9CB;
+    --danger:#C6452B; --danger-soft:#F7DCD2; --pending-line:#E4E0D4;
+    --gov:#2565C7; --gov-soft:#E4EDFB; --semi:#0E8074; --semi-soft:#DFF3EF;
+    --type-international:#2565C7; --type-international-soft:#E4EDFB;
+    --type-series:#7C3FC4; --type-series-soft:#F0E7FB;
+    --type-evergreen:#2E8B57; --type-evergreen-soft:#E3F4EA;
+    --type-interview:#C23B7A; --type-interview-soft:#FBE4EF;
+    --radius-lg:22px; --radius-md:16px; --radius-sm:10px;
+    --shadow:0 14px 34px -16px rgba(23,20,15,.16);
+  }
+
+  *{box-sizing:border-box;}
+  body{background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; margin:0; padding-inline:0;}
+  h1,h2,h3,.disp{font-family:'Manrope',sans-serif; font-weight:800; text-wrap:balance;}
+  button,input,select,textarea{font-family:inherit; color:inherit;}
+  a{color:inherit;}
+  ::selection{background:var(--accent-soft);}
+  .tabular{font-variant-numeric:tabular-nums;}
+
+  #app{min-height:100%;}
+  .shell{display:grid; grid-template-columns:250px 1fr; min-height:100vh;}
+  @media (max-width:900px){ .shell{grid-template-columns:1fr;} }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{background:var(--surface); color:var(--ink); border-right:1px solid var(--line); padding:22px 18px; display:flex; flex-direction:column; gap:22px; position:sticky; top:0; height:100vh;}
+  @media (max-width:900px){ .sidebar{display:none;} }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-mark{width:34px; height:34px; border-radius:10px; background:var(--accent); display:flex; align-items:center; justify-content:center; color:var(--accent-ink); font-family:'Manrope',sans-serif; font-weight:800; font-size:15px; flex:none;}
+  .brand-name{font-family:'Manrope',sans-serif; font-weight:800; font-size:15px; line-height:1.15;}
+  .brand-sub{font-size:11px; color:var(--ink-soft); letter-spacing:.03em;}
+  .side-btn{display:flex; align-items:center; gap:10px; width:100%; padding:11px 12px; border-radius:12px; border:none; background:var(--accent); color:var(--accent-ink); font-weight:700; font-size:13.5px; cursor:pointer;}
+  .side-btn svg{flex:none;}
+  .side-nav{display:flex; flex-direction:column; gap:3px;}
+  .side-link{display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:12px; border:none; background:transparent; color:var(--ink-soft); font-size:13.5px; font-weight:600; cursor:pointer; text-align:left;}
+  .side-link.active{background:var(--accent-soft); color:var(--accent);}
+  .side-link svg{flex:none; opacity:.85;}
+  .contacts{flex:1; overflow:auto; border-top:1px solid var(--line); padding-top:16px; display:flex; flex-direction:column; gap:10px;}
+  .contacts-title{font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--ink-soft); font-weight:700;}
+  .contact-row{display:flex; flex-direction:column; gap:1px; font-size:12.5px;}
+  .contact-row b{color:var(--ink); font-weight:700;}
+  .contact-row span{color:var(--ink-soft);}
+  .profile-pill{display:flex; align-items:center; gap:9px; padding:9px 10px; border-radius:12px; background:var(--surface-2); cursor:pointer; border:none; color:inherit; text-align:left;}
+  .profile-avatar{width:26px; height:26px; border-radius:50%; background:var(--accent); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex:none;}
+  .profile-pill small{display:block; color:var(--ink-soft); font-size:10.5px;}
+  .profile-pill strong{display:block; font-size:12.5px;}
+
+  /* ---------- Main ---------- */
+  .main{min-width:0;}
+  .topbar{position:sticky; top:0; z-index:5; background:var(--bg); border-bottom:1px solid var(--line); padding:16px 26px; display:flex; align-items:center; gap:14px;}
+  @media (max-width:900px){ .topbar{padding:14px 16px; flex-wrap:wrap;} }
+  .topbar h1{font-size:19px; margin:0; flex:none;}
+  .search-wrap{flex:1; display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:8px 12px; max-width:340px;}
+  .search-wrap input{border:none; background:transparent; outline:none; width:100%; font-size:13.5px;}
+  .topbar .spacer{flex:1;}
+  .mobile-only{display:none;}
+  @media (max-width:900px){ .mobile-only{display:flex;} .desktop-only{display:none;} }
+
+  .content{padding:22px 26px 100px;}
+  @media (max-width:900px){ .content{padding:16px 16px 90px;} }
+
+  /* ---------- Buttons / chips ---------- */
+  .btn{display:inline-flex; align-items:center; gap:7px; padding:10px 15px; border-radius:12px; border:1px solid var(--line); background:var(--surface); font-size:13px; font-weight:700; cursor:pointer;}
+  .btn:hover{border-color:var(--ink-soft);}
+  .btn-primary{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+  .btn-primary:hover{filter:brightness(1.05);}
+  .btn-ghost{background:transparent; border-color:transparent;}
+  .btn-danger{color:var(--danger);}
+  .btn-sm{padding:7px 11px; font-size:12px; border-radius:10px;}
+  .btn:disabled{opacity:.45; cursor:not-allowed;}
+  .chip-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .chip{padding:7px 13px; border-radius:999px; border:1px solid var(--line); background:var(--surface); font-size:12.5px; font-weight:700; cursor:pointer; color:var(--ink-soft);}
+  .chip.active{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+  .chip-sm{padding:5px 10px; font-size:11.5px; border-radius:999px; border:1px dashed var(--line); background:transparent; cursor:pointer; color:var(--ink-soft); font-weight:600;}
+  .chip-sm:hover{border-color:var(--accent); color:var(--accent);}
+
+  .badge{display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:800; letter-spacing:.02em; text-transform:uppercase;}
+  .badge-gov{background:var(--gov-soft); color:var(--gov);}
+  .badge-semi{background:var(--semi-soft); color:var(--semi);}
+  .badge-stage{background:var(--surface-2); color:var(--ink); border:1px solid var(--line); text-transform:none; font-size:12px;}
+  .badge-type{text-transform:none; font-size:12px;}
+  .badge-done{background:var(--ok-soft); color:var(--ok);}
+  .badge-overdue{background:var(--danger-soft); color:var(--danger);}
+  .badge-soon{background:var(--warn-soft); color:var(--warn);}
+
+  .section-head{margin-bottom:14px;}
+  .section-head h2{font-size:16px; margin:0;}
+
+  /* ---------- Stats ---------- */
+  .stat-row{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px;}
+  @media (max-width:900px){ .stat-row{grid-template-columns:repeat(2,1fr);} }
+  .stat-tile{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md); padding:15px 16px;}
+  .stat-tile .num{font-family:'Manrope',sans-serif; font-weight:800; font-size:24px;}
+  .stat-tile .lbl{font-size:11.5px; color:var(--ink-soft); font-weight:600; margin-top:2px;}
+
+  /* ---------- Project cards ---------- */
+  .grid-projects{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px;}
+  .card-project{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-lg); padding:18px; cursor:pointer; display:flex; flex-direction:column; gap:12px; box-shadow:var(--shadow); transition:transform .12s ease;}
+  .card-project:hover{transform:translateY(-2px);}
+  .card-project.example{opacity:.55; cursor:default; box-shadow:none;}
+  .card-project.example:hover{transform:none;}
+  .card-top{display:flex; align-items:flex-start; justify-content:space-between; gap:10px;}
+  .card-title{font-family:'Manrope',sans-serif; font-weight:800; font-size:15.5px; line-height:1.25;}
+  .card-entity{font-size:12px; color:var(--ink-soft); margin-top:2px;}
+  .card-badges{display:flex; gap:6px; flex-wrap:wrap;}
+  .progress{height:7px; border-radius:999px; background:var(--surface-2); overflow:hidden;}
+  .progress > div{height:100%; background:var(--accent); border-radius:999px;}
+  .card-meta{display:flex; align-items:center; justify-content:space-between; font-size:11.5px; color:var(--ink-soft);}
+  .card-meta .stage-name{font-weight:700; color:var(--ink);}
+
+  /* ---------- Empty state ---------- */
+  .empty-wrap{text-align:center; padding:40px 10px 26px;}
+  .empty-wrap h2{margin:14px 0 4px; font-size:18px;}
+  .empty-wrap p{color:var(--ink-soft); font-size:13.5px; margin:0 0 16px;}
+  .empty-icon{width:54px; height:54px; border-radius:16px; background:var(--accent-soft); color:var(--accent); display:flex; align-items:center; justify-content:center; margin:0 auto;}
+
+  /* ---------- Modal ---------- */
+  .modal-overlay{position:fixed; inset:0; background:rgba(17,15,11,.5); backdrop-filter:blur(2px); display:flex; align-items:flex-end; justify-content:center; z-index:50; padding:0;}
+  @media (min-width:700px){ .modal-overlay{align-items:center; padding:20px;} }
+  .modal{background:var(--surface); width:100%; max-width:520px; max-height:92vh; overflow:auto; border-radius:22px 22px 0 0; padding:22px; display:flex; flex-direction:column; gap:16px;}
+  @media (min-width:700px){ .modal{border-radius:var(--radius-lg);} }
+  .modal-head{display:flex; align-items:center; justify-content:space-between;}
+  .modal-head h2{font-size:17px; margin:0;}
+  .field{display:flex; flex-direction:column; gap:6px;}
+  .field label{font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft);}
+  .field input[type=text], .field input[type=date], .field select, .field textarea, .field input[list]{
+    border:1px solid var(--line); border-radius:12px; padding:10px 12px; font-size:13.5px; background:var(--surface); outline:none; width:100%;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{border-color:var(--accent);}
+  .field textarea{resize:vertical; min-height:60px;}
+  .seg{display:flex; gap:8px;}
+  .seg button{flex:1; padding:10px; border-radius:12px; border:1px solid var(--line); background:var(--surface); font-weight:700; font-size:13px; cursor:pointer;}
+  .seg button.on{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+  .type-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .type-chip{padding:8px 13px; border-radius:999px; border:1px solid var(--line); background:var(--surface); font-weight:700; font-size:12.5px; cursor:pointer; color:var(--ink-soft); display:flex; align-items:center; gap:6px;}
+  .type-chip .dot{width:8px; height:8px; border-radius:50%; flex:none;}
+  .type-chip.on{border-color:transparent;}
+  .modal-actions{display:flex; gap:10px; justify-content:flex-end; padding-top:4px;}
+  .helptext{font-size:11.5px; color:var(--ink-soft); margin:0;}
+
+  /* ---------- Project detail ---------- */
+  .detail-head{display:flex; flex-direction:column; gap:10px; margin-bottom:20px;}
+  .back-btn{display:inline-flex; align-items:center; gap:6px; background:none; border:none; color:var(--ink-soft); font-weight:700; font-size:12.5px; cursor:pointer; padding:0;}
+  .detail-title-row{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  .detail-title-row h1{font-size:22px; margin:0;}
+  .detail-sub{font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
+  .detail-stats{display:flex; gap:20px; flex-wrap:wrap; padding:14px 16px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md);}
+  .detail-stat .num{font-family:'Manrope',sans-serif; font-weight:800; font-size:18px;}
+  .detail-stat .lbl{font-size:11px; color:var(--ink-soft); font-weight:600;}
+  .deadline-edit{display:flex; gap:8px; align-items:center; margin-top:10px; flex-wrap:wrap;}
+  .deadline-edit input[type=date]{border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:13px; background:var(--surface);}
+  .detail-description{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md); padding:14px 16px; margin-top:14px; font-size:13.5px; line-height:1.55; color:var(--ink); white-space:pre-wrap;}
+  .detail-description .lbl-title{font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft); font-weight:700; margin-bottom:6px;}
+
+  .steps-timeline{list-style:none; margin:20px 0 0; padding:0; display:flex; flex-direction:column;}
+  .step-row{position:relative; padding-left:34px; padding-bottom:18px;}
+  .step-row:last-child{padding-bottom:0;}
+  .step-row::before{content:""; position:absolute; left:10px; top:26px; bottom:0; width:2px; background:var(--pending-line);}
+  .step-row:last-child::before{display:none;}
+  .step-row.done::before{background:var(--ok);}
+  .step-icon{position:absolute; left:0; top:0; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--surface); border:2px solid var(--pending-line); color:var(--ink-soft);}
+  .step-row.done .step-icon{background:var(--ok); border-color:var(--ok); color:#fff;}
+  .step-row.current .step-icon{border-color:var(--accent); color:var(--accent);}
+  .step-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md); padding:13px 15px; cursor:pointer;}
+  .step-card-top{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+  .step-label{font-weight:700; font-size:14px;}
+  .step-hint{font-size:11.5px; color:var(--ink-soft); margin-top:2px;}
+  .step-status-row{display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--ink-soft); margin-top:6px; flex-wrap:wrap;}
+  .dur-badge{background:var(--surface-2); border-radius:999px; padding:2px 9px; font-weight:700; font-size:11px;}
+  .step-form{margin-top:12px; display:flex; flex-direction:column; gap:10px; border-top:1px dashed var(--line); padding-top:12px;}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  @media (max-width:520px){ .field-row{grid-template-columns:1fr;} }
+  .suggest-row{display:flex; gap:6px; flex-wrap:wrap;}
+
+  /* ---------- Calendar ---------- */
+  .cal-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px; flex-wrap:wrap;}
+  .cal-nav{display:flex; align-items:center; gap:6px;}
+  .cal-title{font-size:16px; font-weight:800; font-family:'Manrope',sans-serif; min-width:150px; text-align:center;}
+  .icon-btn{width:32px; height:32px; border-radius:10px; border:1px solid var(--line); background:var(--surface); display:flex; align-items:center; justify-content:center; cursor:pointer;}
+  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
+  .cal-dow{font-size:10.5px; font-weight:700; color:var(--ink-soft); text-align:center; padding-bottom:4px; text-transform:uppercase;}
+  .cal-cell{border-radius:12px; border:1px solid var(--line); background:var(--surface); padding:6px; display:flex; flex-direction:column; gap:3px; cursor:pointer; min-height:68px; overflow:hidden;}
+  .cal-cell.out{opacity:.4;}
+  .cal-cell.today{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset;}
+  .cal-cell.selected{background:var(--accent-soft); border-color:var(--accent);}
+  .cal-cell.selected .cal-daynum{color:var(--accent);}
+  .cal-daynum{font-size:12.5px; font-weight:700;}
+  .cal-dot{width:6px; height:6px; border-radius:50%; flex:none;}
+  .cal-events{display:flex; flex-direction:column; gap:2px; width:100%;}
+  .cal-event-chip{font-size:9.5px; font-weight:700; line-height:1.4; padding:1px 5px; border-radius:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;}
+  .cal-more{font-size:9px; color:var(--ink-soft); font-weight:700; padding-left:2px;}
+  @media (max-width:640px){ .cal-cell{min-height:50px; padding:4px;} .cal-event-chip{font-size:8.5px; padding:1px 3px;} }
+
+  .agenda-panel{margin-top:18px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md); padding:16px;}
+  .agenda-panel h3{margin:0 0 10px; font-size:14px;}
+  .agenda-item{display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line); font-size:13px;}
+  .agenda-item:last-child{border-bottom:none;}
+  .agenda-dot{width:8px; height:8px; border-radius:50%; flex:none;}
+  .agenda-item .t1{font-weight:700;}
+  .agenda-item .t2{color:var(--ink-soft); font-size:11.5px;}
+
+  .week-cols{display:grid; grid-template-columns:repeat(7,1fr); gap:10px;}
+  @media (max-width:900px){ .week-cols{grid-template-columns:1fr;} }
+  .week-col{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md); padding:10px; min-height:120px;}
+  .week-col.today{border-color:var(--accent);}
+  .week-col-head{font-size:11.5px; font-weight:800; margin-bottom:8px; display:flex; justify-content:space-between;}
+  .week-empty{font-size:11px; color:var(--ink-soft); padding:6px 0;}
+
+  /* ---------- Mobile bottom nav ---------- */
+  .mobile-nav{display:none;}
+  @media (max-width:900px){
+    .mobile-nav{display:flex; position:fixed; bottom:0; left:0; right:0; background:var(--surface); border-top:1px solid var(--line); padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px)); justify-content:space-around; z-index:40;}
+  }
+  .mtab{display:flex; flex-direction:column; align-items:center; gap:3px; background:none; border:none; color:var(--ink-soft); font-size:10.5px; font-weight:700; cursor:pointer; padding:4px 10px;}
+  .mtab.active{color:var(--accent);}
+  .mtab-fab{background:var(--accent); color:var(--accent-ink); width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-top:-22px; box-shadow:var(--shadow);}
+
+  .toast{position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--bg); padding:10px 18px; border-radius:999px; font-size:12.5px; font-weight:700; z-index:60; box-shadow:var(--shadow);}
+  @media (min-width:900px){ .toast{bottom:24px;} }
+
+  /* ---------- Feedback ---------- */
+  .feedback-intro{background:var(--accent-soft); border-radius:var(--radius-md); padding:16px 18px; margin-bottom:20px;}
+  .feedback-intro h2{font-size:16px; margin:0 0 4px;}
+  .feedback-intro p{margin:0; font-size:13px; color:var(--ink); opacity:.85;}
+  .feedback-form{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md); padding:16px; display:flex; flex-direction:column; gap:12px; margin-bottom:24px;}
+  .feedback-list{display:flex; flex-direction:column; gap:10px;}
+  .feedback-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md); padding:14px 16px; display:flex; flex-direction:column; gap:8px;}
+  .feedback-msg{font-size:13.5px; line-height:1.5;}
+  .feedback-meta{display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:11.5px; color:var(--ink-soft);}
+  .feedback-cat{padding:3px 9px; border-radius:999px; font-weight:700; font-size:10.5px; text-transform:uppercase;}
+  .feedback-cat-idea{background:var(--gov-soft); color:var(--gov);}
+  .feedback-cat-bug{background:var(--danger-soft); color:var(--danger);}
+  .feedback-cat-question{background:var(--surface-2); color:var(--ink-soft); border:1px solid var(--line);}
+  .feedback-status{padding:3px 10px; border-radius:999px; font-weight:700; font-size:10.5px; cursor:pointer; border:none;}
+  .feedback-status-new{background:var(--warn-soft); color:var(--warn);}
+  .feedback-status-planned{background:var(--gov-soft); color:var(--gov);}
+  .feedback-status-done{background:var(--ok-soft); color:var(--ok);}
+
+  .sync-banner{display:flex; align-items:center; gap:14px; background:var(--warn-soft); color:var(--ink); border-bottom:1px solid var(--warn); padding:12px 26px; font-size:12.5px; line-height:1.4;}
+  @media (max-width:900px){ .sync-banner{padding:10px 16px; flex-direction:column; align-items:flex-start;} }
+  .sync-banner strong{color:var(--warn);}
+  .sync-pill{display:flex; align-items:center; gap:6px; font-size:11px; color:var(--ink-soft); font-weight:600;}
+  .sync-dot{width:7px; height:7px; border-radius:50%; background:var(--ok);}
+  .sync-dot.off{background:var(--warn);}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<!--
+  ============================================================
+  SETUP REQUIRED — read this before this page will save data
+  ============================================================
+  This tracker stores its data in a free Firebase (Firestore) project
+  instead of Claude's built-in database, so ANYONE with the link can
+  use it — no Claude account or organization membership needed.
+
+  To activate it:
+  1. Go to https://console.firebase.google.com and create a free project
+     (no credit card needed for the free "Spark" plan).
+  2. In the project: Build > Firestore Database > Create database >
+     start in production mode > pick a region > Enable.
+  3. In Firestore > Rules, paste this and click Publish (this keeps the
+     same trust model as before: no login, anyone with the link can
+     read/write — fine for an internal team tool, but be aware it is
+     not access-controlled):
+       rules_version = '2';
+       service cloud.firestore {
+         match /databases/{database}/documents {
+           match /{document=**} {
+             allow read, write: if true;
+           }
+         }
+       }
+  4. Project settings (gear icon) > General > "Your apps" > click the
+     </> web icon > register an app (any nickname, no need to set up
+     Firebase Hosting) > copy the firebaseConfig object it shows you.
+  5. Paste that config into FIREBASE_CONFIG below, replacing the
+     placeholder object.
+  6. Upload this file to a free static host — e.g. a public GitHub repo
+     with GitHub Pages turned on (Settings > Pages > Deploy from branch),
+     or drag the file onto https://app.netlify.com/drop.
+  ============================================================
+-->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script>
+  // PASTE YOUR OWN FIREBASE CONFIG HERE (see setup notes above)
+  var FIREBASE_CONFIG = {
+    apiKey: "AIzaSyAieY3zFsXeQRi-gGxB4EK7u9NoTsiMvEg",
+    authDomain: "creative-house-tracker.firebaseapp.com",
+    projectId: "creative-house-tracker",
+    storageBucket: "creative-house-tracker.firebasestorage.app",
+    messagingSenderId: "241753566737",
+    appId: "1:241753566737:web:bf449a0f31576d1cf4cbb0"
+  };
+</script>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- data ---------------- */
+  var STEP_DEFS = [
+    {key:'ideation', label:'Ideation', hint:'Concept development', suggested:[]},
+    {key:'concept_approval', label:'Concept Approval', hint:'Approved by Campaign Manager or Head of Government / Semi-Government', suggested:['Mariam Al Kabbi','Aisha','Mariam Al Mania']},
+    {key:'letter_drafted', label:'Letter Drafted', hint:'Official letter written', suggested:[]},
+    {key:'content_letter_approval', label:'Content Approval (Letter)', hint:'Letter approved by Content', suggested:['Content Team']},
+    {key:'sent_to_hagir', label:'Sent to Hagir', hint:'Forwarded for processing', suggested:['Hagir']},
+    {key:'sent_to_strategy', label:'Sent to Strategy &rarr; Entity', hint:'Strategy passes the letter to the entity', suggested:['Strategy Team']},
+    {key:'shoot_date_confirmed', label:'Shoot Date Confirmed', hint:'Confirmed with Head of Production', suggested:['Samatti']},
+    {key:'shoot', label:'Shoot', hint:'Filming day(s)', suggested:[]},
+    {key:'editing', label:'Editing', hint:'Post-production', suggested:[]},
+    {key:'content_review', label:'Content Review', hint:'Reviewed by Content', suggested:['Content Team']},
+    {key:'strategy_review_entity', label:'Strategy Review & Entity Approval', hint:'Reviewed by Strategy, sent to entity for final approval', suggested:['Strategy Team']}
+  ];
+  var KNOWN_PEOPLE = ['Mariam Al Kabbi','Aisha','Mariam Al Mania','Hagir','Samatti','Content Team','Strategy Team'];
+  var ENTITIES = ['Ministry of Public Health','Hamad Medical Corporation','Qatar Museums','Kahramaa','Ashghal','Qatar Rail','Ministry of Interior','Civil Defence','MCIT','Ministry of Education','Ministry of Municipality','Qatar Foundation','Aspire Zone Foundation'];
+  var FORMATS = ['Reel','Carousel','Photo'];
+  var TYPES = ['International','Series','EverGreen','Interview'];
+  var TYPE_COLORS = {
+    International:{fg:'var(--type-international)', bg:'var(--type-international-soft)'},
+    Series:{fg:'var(--type-series)', bg:'var(--type-series-soft)'},
+    EverGreen:{fg:'var(--type-evergreen)', bg:'var(--type-evergreen-soft)'},
+    Interview:{fg:'var(--type-interview)', bg:'var(--type-interview-soft)'}
+  };
+  function typeColor(t){ return TYPE_COLORS[t] || {fg:'var(--ink-soft)', bg:'var(--surface-2)'}; }
+  function buildTypeChips(selected, action){
+    var h = '<div class="type-row">';
+    TYPES.forEach(function(t){
+      var c = typeColor(t);
+      var on = t===selected;
+      var style = on ? 'background:'+c.bg+';color:'+c.fg+';' : '';
+      h += '<button type="button" class="type-chip'+(on?' on':'')+'" style="'+style+'" data-action="'+action+'" data-value="'+t+'"><span class="dot" style="background:'+c.fg+'"></span>'+t+'</button>';
+    });
+    h += '</div>';
+    return h;
+  }
+  var CONTACTS = [
+    {name:'Mariam Al Kabbi', role:'Government Campaign Manager'},
+    {name:'Aisha', role:'Head of Government'},
+    {name:'Mariam Al Mania', role:'Head of Semi-Government'},
+    {name:'Hagir', role:'Letter Coordinator'},
+    {name:'Samatti', role:'Head of Production'}
+  ];
+
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function uid(){ return 'p_' + Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+  function saveCache(key, data){ try{ localStorage.setItem(key, JSON.stringify(data)); }catch(e){} }
+  function loadCache(key){ try{ var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; }catch(e){ return null; } }
+  function flagSyncFailed(kind, id){
+    var list = kind==='projects' ? state.projects : state.feedback;
+    var idx = list.findIndex(function(x){ return x.id===id; });
+    if(idx>=0){ list[idx] = Object.assign({}, list[idx], {_syncFailed:true}); render(); }
+  }
+  function todayISO(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function parseISO(s){ if(!s) return null; var p=s.split('-'); return new Date(Date.UTC(+p[0],+p[1]-1,+p[2])); }
+  function daysBetween(a,b){ if(!a||!b) return null; var da=parseISO(a.slice(0,10)), db=parseISO(b.slice(0,10)); return Math.round((db-da)/86400000); }
+  function fmtDate(s){ if(!s) return ''; var d=parseISO(s.slice(0,10)); if(!d) return ''; return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}); }
+  function fmtDateShort(s){ if(!s) return ''; var d=parseISO(s.slice(0,10)); if(!d) return ''; return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',timeZone:'UTC'}); }
+  function initials(name){ name=(name||'').trim(); if(!name) return '?'; var parts=name.split(/\s+/); return (parts[0][0]+(parts[1]?parts[1][0]:'')).toUpperCase(); }
+
+  function buildSteps(){
+    return STEP_DEFS.map(function(d){
+      return {key:d.key, status:'pending', plannedDate:null, completedDate:null, completedBy:null, note:''};
+    });
+  }
+  function stepDef(key){ for(var i=0;i<STEP_DEFS.length;i++){ if(STEP_DEFS[i].key===key) return STEP_DEFS[i]; } return null; }
+  function currentStepIndex(steps){
+    for(var i=0;i<steps.length;i++){ if(steps[i].status!=='done') return i; }
+    return steps.length;
+  }
+  function progressOf(p){ var done=0; p.steps.forEach(function(s){ if(s.status==='done') done++; }); return done; }
+
+  var EXAMPLE_PROJECT = (function(){
+    var steps = buildSteps();
+    steps[0].status='done'; steps[0].completedDate='2025-12-01'; steps[0].completedBy='Ahmed Hassan';
+    steps[1].status='done'; steps[1].completedDate='2025-12-03'; steps[1].completedBy='Aisha';
+    return {id:'example', title:'National Preparedness Film', category:'Government', entity:'Civil Defence', format:'Reel', type:'Series',
+      description:'A field series showing how Civil Defence, Kahramaa and MOPH quietly keep Qatar running during disruption &mdash; water, power, roads and emergency response working together in one ordinary morning.',
+      createdAt:'2025-12-01T09:00:00.000Z', createdBy:'Ahmed Hassan', archived:false, steps:steps};
+  })();
+
+  /* ---------------- state ---------------- */
+  var state = {
+    view:'dashboard',
+    projects:[],
+    loading:true,
+    feedback:[],
+    feedbackLoading:true,
+    feedbackFilter:'all',
+    dbAvailable:null,
+    selectedProjectId:null,
+    editingStepKey:null,
+    editingDeadline:null,
+    syncDegraded:false,
+    connectAttempted:false,
+    showNewProject:false,
+    showNameGate:false,
+    nameGateMode:'set',
+    calendarView:'month',
+    calendarAnchor:todayISO(),
+    selectedDate:todayISO(),
+    filterCategory:'all',
+    filterType:'all',
+    filterStatus:'active',
+    search:'',
+    notice:null,
+    draft:{},
+    myName: (function(){ try{ return localStorage.getItem('gco_tracker_name')||''; }catch(e){ return ''; } })()
+  };
+
+  var db = null;
+  var unsub = null;
+
+  /* ---------------- icons ---------------- */
+  function icon(name, size){
+    size = size||18;
+    var p = {
+      grid:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
+      calendar:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/>',
+      plus:'<path d="M12 5v14M5 12h14"/>',
+      chevL:'<path d="M15 18l-6-6 6-6"/>',
+      chevR:'<path d="M9 18l6-6-6-6"/>',
+      back:'<path d="M15 18l-6-6 6-6"/>',
+      check:'<path d="M20 6L9 17l-5-5"/>',
+      x:'<path d="M18 6L6 18M6 6l12 12"/>',
+      search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+      user:'<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6"/>',
+      trash:'<path d="M4 7h16M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2m2 0-1 13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 7"/>',
+      undo:'<path d="M3 10h9a5 5 0 1 1-4.9 6"/><path d="M3 4v6h6"/>',
+      feedback:'<path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'
+    }[name] || '';
+    return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';
+  }
+
+  /* ---------------- db plumbing ---------------- */
+  function cloneProject(p){ return JSON.parse(JSON.stringify(p)); }
+
+  var watchdogId = null;
+  function armWatchdog(){
+    if(watchdogId) clearTimeout(watchdogId);
+    watchdogId = setTimeout(function(){
+      if(state.loading){
+        state.loading = false;
+        state.syncDegraded = true;
+        render();
+      }
+    }, 7000);
+  }
+
+  function subscribeProjects(){
+    if(!db){ state.loading=false; render(); return; }
+    if(unsub){ try{ unsub(); }catch(e){} }
+    armWatchdog();
+    unsub = db.collection('projects').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
+      if(watchdogId){ clearTimeout(watchdogId); watchdogId=null; }
+      state.projects = snap.docs.map(function(d){ var data=d.data()||{}; data.id=d.id; if(!data.steps) data.steps=buildSteps(); return data; });
+      state.loading=false;
+      state.syncDegraded=false;
+      render();
+    }, function(err){
+      if(watchdogId){ clearTimeout(watchdogId); watchdogId=null; }
+      showNotice('Sync error: '+(err&&err.message||'unavailable'));
+      state.loading=false;
+      state.syncDegraded=true;
+      render();
+    });
+  }
+
+  function showNotice(text){
+    state.notice = text;
+    render();
+    setTimeout(function(){ state.notice=null; render(); }, 2600);
+  }
+
+  function createProject(data){
+    var doc = {
+      title:data.title, category:data.category, entity:data.entity||'', format:data.format||'Reel',
+      type:data.type||TYPES[0],
+      description:data.description||'', deadline:data.deadline||null,
+      createdAt:new Date().toISOString(), createdBy:data.createdBy||'Unknown', archived:false,
+      updatedAt:new Date().toISOString(), steps:buildSteps()
+    };
+    var id;
+    if(db){
+      var ref;
+      try{ ref = db.collection('projects').doc(); }catch(e){ ref = null; }
+      if(ref){
+        id = ref.id;
+        var localDoc = Object.assign({id:id}, doc);
+        state.projects.unshift(localDoc);
+        render();
+        ref.set(doc).then(function(){ showNotice('Project created'); }).catch(function(){
+          showNotice('Could not sync to the shared tracker &mdash; it will only show in this browser');
+          flagSyncFailed('projects', id);
+        });
+        return id;
+      }
+    }
+    id = uid();
+    var localOnly = Object.assign({id:id}, doc);
+    state.projects.unshift(localOnly);
+    showNotice(db ? 'Project created' : 'Project created (local preview only)');
+    render();
+    return id;
+  }
+
+  async function patchStep(projectId, stepKey, patch){
+    var idx = state.projects.findIndex(function(p){ return p.id===projectId; });
+    if(idx<0) return;
+    var proj = cloneProject(state.projects[idx]);
+    var steps = proj.steps.map(function(s){ return s.key===stepKey ? Object.assign({}, s, patch) : s; });
+    proj.steps = steps;
+    proj.updatedAt = new Date().toISOString();
+    state.projects[idx] = proj;
+    render();
+    if(db){
+      try{ await db.doc('projects/'+projectId).update({steps:steps, updatedAt:proj.updatedAt}); }
+      catch(e){ showNotice('Could not sync update &mdash; check the share settings'); flagSyncFailed('projects', projectId); }
+    }
+  }
+
+  async function patchProject(projectId, patch){
+    var idx = state.projects.findIndex(function(p){ return p.id===projectId; });
+    if(idx<0) return;
+    var proj = Object.assign({}, state.projects[idx], patch, {updatedAt:new Date().toISOString()});
+    state.projects[idx] = proj;
+    render();
+    if(db){
+      try{ await db.doc('projects/'+projectId).update(Object.assign({}, patch, {updatedAt:proj.updatedAt})); }
+      catch(e){ showNotice('Could not sync update &mdash; check the share settings'); flagSyncFailed('projects', projectId); }
+    }
+  }
+
+  async function deleteProject(projectId){
+    if(!confirm('Delete this project? This cannot be undone.')) return;
+    state.projects = state.projects.filter(function(p){ return p.id!==projectId; });
+    state.view='dashboard'; state.selectedProjectId=null;
+    render();
+    if(db){ try{ await db.doc('projects/'+projectId).delete(); }catch(e){ showNotice('Could not delete on server'); } }
+  }
+
+  /* ---------------- feedback ---------------- */
+  var feedbackUnsub = null;
+  function subscribeFeedback(){
+    if(!db){ state.feedbackLoading=false; render(); return; }
+    if(feedbackUnsub){ try{ feedbackUnsub(); }catch(e){} }
+    feedbackUnsub = db.collection('feedback').orderBy('createdAt','desc').limit(300).onSnapshot(function(snap){
+      state.feedback = snap.docs.map(function(d){ var data=d.data()||{}; data.id=d.id; return data; });
+      state.feedbackLoading=false;
+      render();
+    }, function(){
+      state.feedbackLoading=false;
+      render();
+    });
+    setTimeout(function(){ if(state.feedbackLoading){ state.feedbackLoading=false; render(); } }, 7000);
+  }
+
+  function createFeedback(data){
+    var doc = {
+      message:data.message, category:data.category||'idea', author:data.author||'Unknown',
+      status:'new', createdAt:new Date().toISOString()
+    };
+    if(db){
+      var ref;
+      try{ ref = db.collection('feedback').doc(); }catch(e){ ref=null; }
+      if(ref){
+        var localDoc = Object.assign({id:ref.id}, doc);
+        state.feedback.unshift(localDoc);
+        render();
+        ref.set(doc).then(function(){ showNotice('Feedback sent &mdash; thank you!'); }).catch(function(){
+          showNotice('Could not sync your feedback to the team');
+          flagSyncFailed('feedback', ref.id);
+        });
+        return;
+      }
+    }
+    var localOnly = Object.assign({id:uid()}, doc);
+    state.feedback.unshift(localOnly);
+    showNotice(db ? 'Feedback sent &mdash; thank you!' : 'Feedback saved (local preview only)');
+    render();
+  }
+
+  function cycleFeedbackStatus(id){
+    var order = ['new','planned','done'];
+    var idx = state.feedback.findIndex(function(f){ return f.id===id; });
+    if(idx<0) return;
+    var next = order[(order.indexOf(state.feedback[idx].status)+1)%order.length];
+    var updated = Object.assign({}, state.feedback[idx], {status:next});
+    state.feedback[idx] = updated;
+    render();
+    if(db){ db.doc('feedback/'+id).update({status:next}).catch(function(){ showNotice('Could not sync status'); }); }
+  }
+
+  function deleteFeedback(id){
+    if(!confirm('Delete this feedback item?')) return;
+    state.feedback = state.feedback.filter(function(f){ return f.id!==id; });
+    render();
+    if(db){ db.doc('feedback/'+id).delete().catch(function(){ showNotice('Could not delete on server'); }); }
+  }
+
+  /* ---------------- derived helpers ---------------- */
+  function stageLabel(p){
+    var i = currentStepIndex(p.steps);
+    if(i>=p.steps.length) return 'Completed';
+    return stepDef(p.steps[i].key).label;
+  }
+  function isOverdue(p){
+    var i = currentStepIndex(p.steps);
+    if(i>=p.steps.length) return false;
+    if(p.deadline && p.deadline < todayISO()) return true;
+    var s = p.steps[i];
+    return !!(s.plannedDate && s.plannedDate < todayISO());
+  }
+  function deadlineState(p){
+    if(!p.deadline) return 'none';
+    if(progressOf(p)>=p.steps.length) return 'done';
+    var today = todayISO();
+    if(p.deadline < today) return 'overdue';
+    if(daysBetween(today, p.deadline) <= 7) return 'soon';
+    return 'ok';
+  }
+  function daysInStage(p){
+    var i = currentStepIndex(p.steps);
+    var since = i===0 ? p.createdAt : (p.steps[i-1].completedDate || p.createdAt);
+    return daysBetween(since, i>=p.steps.length ? (p.steps[p.steps.length-1].completedDate||todayISO()) : todayISO());
+  }
+  function filteredProjects(){
+    return state.projects.filter(function(p){
+      if(state.filterCategory!=='all' && p.category!==state.filterCategory) return false;
+      if(state.filterType!=='all' && (p.type||TYPES[0])!==state.filterType) return false;
+      var done = progressOf(p)===p.steps.length;
+      if(state.filterStatus==='active' && done) return false;
+      if(state.filterStatus==='completed' && !done) return false;
+      if(state.search){
+        var q = state.search.toLowerCase();
+        var hay = (p.title+' '+p.entity+' '+p.createdBy).toLowerCase();
+        if(hay.indexOf(q)===-1) return false;
+      }
+      return true;
+    });
+  }
+  function eventsForDate(dateStr){
+    var out = [];
+    state.projects.forEach(function(p){
+      if(p.deadline===dateStr){
+        out.push({projectId:p.id, projectTitle:p.title, category:p.category, stepLabel:'Project deadline', kind:'deadline', name:null});
+      }
+      p.steps.forEach(function(s){
+        var def = stepDef(s.key);
+        if(s.status==='done' && s.completedDate===dateStr){
+          out.push({projectId:p.id, projectTitle:p.title, category:p.category, stepLabel:def.label, kind:'done', name:s.completedBy});
+        } else if(s.status!=='done' && s.plannedDate===dateStr){
+          out.push({projectId:p.id, projectTitle:p.title, category:p.category, stepLabel:def.label, kind:'planned', name:null});
+        }
+      });
+    });
+    return out;
+  }
+  function dotColor(kind){
+    return kind==='done' ? 'var(--ok)' : (kind==='deadline' ? 'var(--danger)' : 'var(--warn)');
+  }
+  function dotSoft(kind){
+    return kind==='done' ? 'var(--ok-soft)' : (kind==='deadline' ? 'var(--danger-soft)' : 'var(--warn-soft)');
+  }
+  function eventLabel(e){
+    return e.kind==='deadline' ? e.projectTitle : (e.projectTitle+' - '+e.stepLabel);
+  }
+  function monthMatrix(anchorISO){
+    var d = parseISO(anchorISO);
+    var y=d.getUTCFullYear(), m=d.getUTCMonth();
+    var first = new Date(Date.UTC(y,m,1));
+    var startOffset = (first.getUTCDay()+6)%7; // Monday=0
+    var start = new Date(Date.UTC(y,m,1-startOffset));
+    var cells=[];
+    for(var i=0;i<42;i++){
+      var cd = new Date(Date.UTC(y,m,1-startOffset+i));
+      cells.push({iso: cd.toISOString().slice(0,10), inMonth: cd.getUTCMonth()===m, day: cd.getUTCDate()});
+    }
+    return cells;
+  }
+  function addMonths(iso,n){ var d=parseISO(iso); return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth()+n, 1)).toISOString().slice(0,10); }
+  function addDays(iso,n){ var d=parseISO(iso); return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()+n)).toISOString().slice(0,10); }
+  function startOfWeek(iso){ var d=parseISO(iso); var off=(d.getUTCDay()+6)%7; return addDays(iso, -off); }
+
+  /* ---------------- render ---------------- */
+  var appEl = document.getElementById('app');
+
+  function render(){
+    var active = document.activeElement;
+    var activeId = active && active.id;
+    var selStart = active && ('selectionStart' in active) ? active.selectionStart : null;
+    var selEnd = active && ('selectionStart' in active) ? active.selectionEnd : null;
+
+    if(!state.loading) saveCache('gco_tracker_projects_v1', state.projects);
+    if(!state.feedbackLoading) saveCache('gco_tracker_feedback_v1', state.feedback);
+
+    appEl.innerHTML = buildApp();
+
+    if(activeId){
+      var el = document.getElementById(activeId);
+      if(el){
+        el.focus({preventScroll:true});
+        if(selStart!=null && el.setSelectionRange){ try{ el.setSelectionRange(selStart, selEnd); }catch(e){} }
+      }
+    }
+  }
+
+  function buildApp(){
+    if(!state.myName && state.showNameGate===false){ state.showNameGate=true; state.nameGateMode='set'; }
+    var html = '<div class="shell">';
+    html += buildSidebar();
+    html += '<div class="main">';
+    html += buildTopbar();
+    if(state.connectAttempted && (!db || state.syncDegraded)) html += buildSyncBanner();
+    html += '<div class="content">';
+    if(state.loading){
+      html += '<div class="empty-wrap"><div class="empty-icon">'+icon('calendar',26)+'</div><h2>Loading tracker&hellip;</h2>'+
+        '<p class="helptext">Taking a while? <button class="chip-sm" data-action="retry-sync" style="border-style:solid;">Reload now</button></p></div>';
+    } else if(state.view==='project' && getProject(state.selectedProjectId)){
+      html += buildProjectDetail(getProject(state.selectedProjectId));
+    } else if(state.view==='feedback'){
+      html += buildFeedback();
+    } else {
+      html += buildDashboard();
+    }
+    html += '</div></div></div>';
+    html += buildMobileNav();
+    if(state.showNewProject) html += buildNewProjectModal();
+    if(state.showNameGate) html += buildNameGateModal();
+    if(state.notice) html += '<div class="toast">'+esc(state.notice)+'</div>';
+    return html;
+  }
+
+  function getProject(id){ if(id==='example') return EXAMPLE_PROJECT; return state.projects.find(function(p){ return p.id===id; }); }
+
+  function buildSyncBanner(){
+    var h = '<div class="sync-banner">';
+    h += '<div><strong>'+(state.syncDegraded?'Sync issue &mdash; ':'Not connected to the shared tracker &mdash; ')+'</strong>';
+    h += 'changes you make here are only saved in this browser and will disappear if you clear your data. They are not visible to your teammates yet.';
+    h += '</div>';
+    h += '<button class="btn btn-sm btn-primary" data-action="retry-sync" style="flex:none;">Retry</button>';
+    h += '</div>';
+    return h;
+  }
+
+  function buildSidebar(){
+    var h = '<div class="sidebar">';
+    h += '<div class="brand"><div class="brand-mark">G</div><div><div class="brand-name">GCO Creative</div><div class="brand-sub">Production Tracker &middot; Beta</div></div></div>';
+    h += '<button class="side-btn" data-action="new-project">'+icon('plus',16)+' New Project</button>';
+    h += '<div class="side-nav">';
+    h += '<button class="side-link'+(state.view==='dashboard'?' active':'')+'" data-action="go-dashboard">'+icon('grid',16)+' Dashboard</button>';
+    h += '<button class="side-link'+(state.view==='feedback'?' active':'')+'" data-action="go-feedback">'+icon('feedback',16)+' Feedback</button>';
+    h += '</div>';
+    h += '<div class="contacts"><div class="contacts-title">Key Contacts</div>';
+    CONTACTS.forEach(function(c){ h += '<div class="contact-row"><b>'+esc(c.name)+'</b><span>'+esc(c.role)+'</span></div>'; });
+    h += '</div>';
+    h += '<button class="profile-pill" data-action="edit-name"><div class="profile-avatar">'+esc(initials(state.myName))+'</div><div><small>Signed in as</small><strong>'+esc(state.myName||'Set your name')+'</strong></div></button>';
+    h += '</div>';
+    return h;
+  }
+
+  function buildTopbar(){
+    var title = state.view==='feedback' ? 'Feedback' : (state.view==='project' ? 'Project' : 'Dashboard');
+    var h = '<div class="topbar">';
+    h += '<h1 class="desktop-only">'+title+'</h1>';
+    h += '<button class="icon-btn mobile-only" data-action="go-dashboard">'+icon('grid',16)+'</button>';
+    if(state.view==='dashboard'){
+      h += '<div class="search-wrap"><span style="opacity:.5">'+icon('search',15)+'</span><input id="searchInput" data-draft="search" placeholder="Search projects, entities, people&hellip;" value="'+esc(state.draft.search!=null?state.draft.search:state.search)+'"></div>';
+    }
+    h += '<div class="spacer"></div>';
+    if(state.syncDegraded){
+      h += '<div class="sync-pill desktop-only"><span class="sync-dot off"></span>Sync issue &middot; <button class="chip-sm" data-action="retry-sync" style="border-style:solid;padding:2px 9px;">Retry</button></div>';
+    } else {
+      h += '<div class="sync-pill desktop-only"><span class="sync-dot'+(db?'':' off')+'"></span>'+(db?'Live sync on':'Preview mode')+'</div>';
+    }
+    h += '<button class="btn btn-primary desktop-only" data-action="new-project">'+icon('plus',15)+' New Project</button>';
+    h += '</div>';
+    return h;
+  }
+
+  function buildMobileNav(){
+    var h = '<div class="mobile-nav">';
+    h += '<button class="mtab'+(state.view==='dashboard'?' active':'')+'" data-action="go-dashboard">'+icon('grid',18)+'<span>Dashboard</span></button>';
+    h += '<button class="mtab" data-action="new-project" style="margin-top:-26px;"><span class="mtab-fab">'+icon('plus',20)+'</span></button>';
+    h += '<button class="mtab'+(state.view==='feedback'?' active':'')+'" data-action="go-feedback">'+icon('feedback',18)+'<span>Feedback</span></button>';
+    h += '</div>';
+    return h;
+  }
+
+  /* ---- Dashboard ---- */
+  function buildDashboard(){
+    var list = filteredProjects();
+    var total = state.projects.length;
+    var activeCount = state.projects.filter(function(p){ return progressOf(p)<p.steps.length; }).length;
+    var overdueCount = state.projects.filter(isOverdue).length;
+    var completedCount = total-activeCount;
+    var h = '';
+    h += '<div class="stat-row">';
+    h += statTile(total,'Total Projects');
+    h += statTile(activeCount,'Active');
+    h += statTile(overdueCount,'Overdue');
+    h += statTile(completedCount,'Completed');
+    h += '</div>';
+
+    h += '<div class="section-head"><h2>Calendar</h2></div>';
+    h += buildCalendar();
+
+    h += '<div class="section-head" style="margin-top:32px;"><h2>Projects</h2></div>';
+    h += '<div class="chip-row" style="margin-bottom:10px;">';
+    ['all','Government','Semi-Government'].forEach(function(c){
+      h += '<button class="chip'+(state.filterCategory===c?' active':'')+'" data-action="filter-cat" data-value="'+c+'">'+(c==='all'?'All Categories':c)+'</button>';
+    });
+    h += '</div>';
+    h += '<div class="chip-row" style="margin-bottom:20px;">';
+    h += '<button class="chip'+(state.filterType==='all'?' active':'')+'" data-action="filter-type" data-value="all">All Types</button>';
+    TYPES.forEach(function(t){
+      var tc = typeColor(t);
+      var on = state.filterType===t;
+      var style = on ? 'background:'+tc.fg+';color:#fff;border-color:'+tc.fg+';' : '';
+      h += '<button class="chip" style="'+style+'" data-action="filter-type" data-value="'+t+'">'+t+'</button>';
+    });
+    h += '<span style="width:6px"></span>';
+    ['active','completed','all'].forEach(function(c){
+      h += '<button class="chip'+(state.filterStatus===c?' active':'')+'" data-action="filter-status" data-value="'+c+'">'+(c[0].toUpperCase()+c.slice(1))+'</button>';
+    });
+    h += '</div>';
+
+    if(total===0){
+      h += buildEmptyState();
+    } else if(list.length===0){
+      h += '<div class="empty-wrap"><h2>No projects match</h2><p>Try a different filter or search.</p></div>';
+    } else {
+      h += '<div class="grid-projects">';
+      list.forEach(function(p){ h += buildProjectCard(p); });
+      h += '</div>';
+    }
+    return h;
+  }
+
+  function statTile(num,lbl){
+    return '<div class="stat-tile"><div class="num tabular">'+num+'</div><div class="lbl">'+lbl+'</div></div>';
+  }
+
+  function buildEmptyState(){
+    var h = '<div class="empty-wrap"><div class="empty-icon">'+icon('grid',24)+'</div>';
+    h += '<h2>No projects yet</h2><p>Create your first creative project to start tracking it through the GCO pipeline.</p>';
+    h += '<button class="btn btn-primary" data-action="new-project">'+icon('plus',15)+' New Project</button></div>';
+    h += '<p class="helptext" style="text-align:center;margin-top:22px;">Example of what a project card looks like:</p>';
+    h += '<div class="grid-projects" style="margin-top:10px;">'+buildProjectCard(EXAMPLE_PROJECT, true)+'</div>';
+    return h;
+  }
+
+  function buildProjectCard(p, isExample){
+    var done = progressOf(p);
+    var pct = Math.round(done/p.steps.length*100);
+    var overdue = isOverdue(p);
+    var type = p.type || TYPES[0];
+    var tc = typeColor(type);
+    var h = '<div class="card-project'+(isExample?' example':'')+'" style="border-left:4px solid '+tc.fg+';" '+(isExample?'':'data-action="open-project" data-id="'+p.id+'"')+'>';
+    h += '<div class="card-top"><div><div class="card-title">'+esc(p.title)+'</div><div class="card-entity">'+esc(p.entity||'No entity set')+'</div></div>';
+    h += '<div class="card-badges"><span class="badge badge-type" style="background:'+tc.bg+';color:'+tc.fg+';">'+esc(type)+'</span>'+(p.category==='Government'?'<span class="badge badge-gov">Gov</span>':'<span class="badge badge-semi">Semi-Gov</span>')+(isExample?'<span class="badge badge-stage">Example</span>':'')+'</div></div>';
+    h += '<div><div class="progress"><div style="width:'+pct+'%"></div></div></div>';
+    h += '<div class="card-meta"><span>Stage: <span class="stage-name">'+esc(stageLabel(p))+'</span></span>';
+    h += overdue ? '<span class="badge badge-overdue">Overdue</span>' : '<span>'+done+'/'+p.steps.length+' done</span>';
+    h += '</div>';
+    if(p.deadline){
+      var ds = deadlineState(p);
+      var dcls = ds==='overdue' ? 'badge-overdue' : (ds==='soon' ? 'badge-soon' : 'badge-stage');
+      h += '<div><span class="badge '+dcls+'">'+icon('calendar',11)+' Deadline '+fmtDateShort(p.deadline)+'</span></div>';
+    }
+    if(p._syncFailed){
+      h += '<div><span class="badge badge-overdue">'+icon('x',10)+' Not saved to team tracker</span></div>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  /* ---- Project detail ---- */
+  function buildProjectDetail(p){
+    var done = progressOf(p);
+    var idx = currentStepIndex(p.steps);
+    var totalDays = daysBetween(p.createdAt, idx>=p.steps.length ? p.steps[p.steps.length-1].completedDate : todayISO());
+    var type = p.type || TYPES[0];
+    var tc = typeColor(type);
+    var h = '<button class="back-btn" data-action="go-dashboard">'+icon('back',14)+' Back to Dashboard</button>';
+    h += '<div class="detail-head" style="border-left:4px solid '+tc.fg+'; padding-left:14px;">';
+    h += '<div class="detail-title-row"><div><h1>'+esc(p.title)+'</h1><div class="detail-sub">'+esc(p.entity||'No entity set')+' &middot; '+esc(p.format||'Other')+'</div></div>';
+    h += '<div class="card-badges"><span class="badge badge-type" style="background:'+tc.bg+';color:'+tc.fg+';">'+esc(type)+'</span>'+(p.category==='Government'?'<span class="badge badge-gov">Government</span>':'<span class="badge badge-semi">Semi-Government</span>')+'<span class="badge badge-stage">'+esc(stageLabel(p))+'</span></div>';
+    h += '</div>';
+    h += '<div class="detail-stats">';
+    h += '<div class="detail-stat"><div class="num tabular">'+done+'/'+p.steps.length+'</div><div class="lbl">Checkpoints done</div></div>';
+    h += '<div class="detail-stat"><div class="num tabular">'+(totalDays!=null?totalDays:'&mdash;')+'</div><div class="lbl">Days elapsed</div></div>';
+    h += '<div class="detail-stat"><div class="num tabular">'+esc(p.createdBy||'&mdash;')+'</div><div class="lbl">Created by</div></div>';
+    h += '<div class="detail-stat"><div class="num tabular">'+fmtDateShort(p.createdAt)+'</div><div class="lbl">Created on</div></div>';
+    if(p.id!=='example'){
+      var ds2 = deadlineState(p);
+      var dlColor = ds2==='overdue' ? 'var(--danger)' : (ds2==='soon' ? 'var(--warn)' : 'var(--ink)');
+      h += '<button type="button" class="detail-stat" style="cursor:pointer;border:none;background:none;text-align:left;padding:0;font:inherit;" data-action="toggle-deadline" data-id="'+p.id+'">';
+      h += '<div class="num tabular" style="color:'+dlColor+'">'+(p.deadline?fmtDateShort(p.deadline):'&mdash;')+'</div><div class="lbl">Deadline &middot; edit</div></button>';
+    }
+    if(p.id!=='example') h += '<button class="btn btn-sm btn-danger" style="margin-left:auto;" data-action="delete-project" data-id="'+p.id+'">'+icon('trash',13)+' Delete</button>';
+    h += '</div>';
+    if(state.editingDeadline===p.id){
+      h += '<div class="deadline-edit">';
+      h += '<input id="deadlineInput" type="date" value="'+esc(p.deadline||'')+'">';
+      h += '<button class="btn btn-sm btn-primary" data-action="save-deadline" data-id="'+p.id+'">Save</button>';
+      if(p.deadline) h += '<button class="btn btn-sm" data-action="clear-deadline" data-id="'+p.id+'">Clear</button>';
+      h += '<button class="btn btn-sm btn-ghost" data-action="toggle-deadline" data-id="'+p.id+'">Cancel</button>';
+      h += '</div>';
+    }
+    if(p.description) h += '<div class="detail-description"><div class="lbl-title">Description</div>'+esc(p.description)+'</div>';
+    h += '</div>';
+
+    h += '<ul class="steps-timeline">';
+    p.steps.forEach(function(s, i){
+      var def = stepDef(s.key);
+      var isDone = s.status==='done';
+      var isCurrent = i===idx;
+      var editing = state.editingStepKey===s.key;
+      h += '<li class="step-row'+(isDone?' done':'')+(isCurrent?' current':'')+'">';
+      h += '<div class="step-icon">'+(isDone?icon('check',12):(i+1))+'</div>';
+      h += '<div class="step-card" data-action="toggle-step" data-key="'+s.key+'" data-project="'+p.id+'">';
+      h += '<div class="step-card-top"><div><div class="step-label">'+esc(def.label)+'</div><div class="step-hint">'+esc(def.hint)+'</div></div>';
+      if(isDone) h += '<span class="badge badge-done">'+icon('check',11)+' Done</span>';
+      else if(s.plannedDate && s.plannedDate<todayISO()) h += '<span class="badge badge-overdue">Overdue</span>';
+      else if(isCurrent) h += '<span class="badge badge-stage">Current</span>';
+      h += '</div>';
+      h += '<div class="step-status-row">';
+      if(isDone){
+        h += '<span>'+icon('user',12)+' '+esc(s.completedBy||'&mdash;')+'</span><span>&middot;</span><span>'+fmtDate(s.completedDate)+'</span>';
+        var prevDate = i===0 ? p.createdAt : (p.steps[i-1].completedDate || p.createdAt);
+        var dur = daysBetween(prevDate, s.completedDate);
+        if(dur!=null) h += '<span class="dur-badge">+'+dur+'d</span>';
+        if(s.note) h += '<span>&middot; '+esc(s.note)+'</span>';
+      } else {
+        h += s.plannedDate ? '<span>Target: '+fmtDate(s.plannedDate)+'</span>' : '<span>No target date set</span>';
+      }
+      h += '</div>';
+
+      if(editing && p.id!=='example'){
+        h += buildStepForm(p, s, def);
+      }
+      h += '</div></li>';
+    });
+    h += '</ul>';
+    return h;
+  }
+
+  function buildStepForm(p, s, def){
+    var dr = state.draft;
+    var plannedVal = dr.stepPlanned!=null ? dr.stepPlanned : (s.plannedDate||'');
+    var completedVal = dr.stepCompleted!=null ? dr.stepCompleted : (s.completedDate||todayISO());
+    var nameVal = dr.stepName!=null ? dr.stepName : (s.completedBy || state.myName || '');
+    var noteVal = dr.stepNote!=null ? dr.stepNote : (s.note||'');
+    var h = '<div class="step-form" data-stop="1">';
+    h += '<div class="field-row">';
+    h += '<div class="field"><label>Target date</label><input id="stepPlanned" type="date" data-draft="stepPlanned" value="'+esc(plannedVal)+'"></div>';
+    h += '<div class="field"><label>Sign-off date</label><input id="stepCompleted" type="date" data-draft="stepCompleted" value="'+esc(completedVal)+'"></div>';
+    h += '</div>';
+    h += '<div class="field"><label>Signed off by</label><input id="stepName" type="text" list="peopleList" data-draft="stepName" placeholder="Type a name" value="'+esc(nameVal)+'"></div>';
+    if(def.suggested.length){
+      h += '<div class="suggest-row">';
+      def.suggested.forEach(function(n){ h += '<button type="button" class="chip-sm" data-action="fill-name" data-value="'+esc(n)+'">'+esc(n)+'</button>'; });
+      if(state.myName) h += '<button type="button" class="chip-sm" data-action="fill-name" data-value="'+esc(state.myName)+'">Me ('+esc(state.myName)+')</button>';
+      h += '</div>';
+    }
+    h += '<div class="field"><label>Note (optional)</label><textarea id="stepNote" data-draft="stepNote" placeholder="Add context&hellip;">'+esc(noteVal)+'</textarea></div>';
+    h += '<div class="modal-actions" style="justify-content:space-between;">';
+    h += '<div>';
+    if(s.status==='done') h += '<button class="btn btn-sm" data-action="reopen-step" data-project="'+p.id+'" data-key="'+s.key+'">'+icon('undo',13)+' Reopen</button>';
+    h += '</div><div style="display:flex;gap:8px;">';
+    h += '<button class="btn btn-sm" data-action="save-target" data-project="'+p.id+'" data-key="'+s.key+'">Save Target Only</button>';
+    h += '<button class="btn btn-sm btn-primary" data-action="complete-step" data-project="'+p.id+'" data-key="'+s.key+'">'+icon('check',13)+' Mark Complete</button>';
+    h += '</div></div>';
+    h += '</div>';
+    return h;
+  }
+
+  /* ---- Calendar ---- */
+  function buildCalendar(){
+    var h = '<div class="chip-row" style="margin-bottom:14px;">';
+    ['day','week','month'].forEach(function(v){
+      h += '<button class="chip'+(state.calendarView===v?' active':'')+'" data-action="cal-view" data-value="'+v+'">'+v[0].toUpperCase()+v.slice(1)+'</button>';
+    });
+    h += '<button class="chip" data-action="cal-today">Today</button>';
+    h += '</div>';
+
+    if(state.calendarView==='month') h += buildMonthView();
+    else if(state.calendarView==='week') h += buildWeekView();
+    else h += buildDayView();
+
+    return h;
+  }
+
+  function legendDots(){
+    return '<div class="chip-row" style="margin:14px 0 0;font-size:11px;color:var(--ink-soft);align-items:center;">'+
+      '<span style="display:flex;align-items:center;gap:5px;"><span class="cal-dot" style="background:var(--warn);display:inline-block;"></span>Target date</span>'+
+      '<span style="display:flex;align-items:center;gap:5px;"><span class="cal-dot" style="background:var(--ok);display:inline-block;"></span>Completed</span>'+
+      '<span style="display:flex;align-items:center;gap:5px;"><span class="cal-dot" style="background:var(--danger);display:inline-block;"></span>Deadline</span></div>';
+  }
+
+  function buildMonthView(){
+    var cells = monthMatrix(state.calendarAnchor);
+    var d = parseISO(state.calendarAnchor);
+    var monthName = d.toLocaleDateString('en-GB',{month:'long',year:'numeric',timeZone:'UTC'});
+    var h = '<div class="cal-head"><div class="cal-title">'+monthName+'</div><div class="cal-nav">';
+    h += '<button class="icon-btn" data-action="cal-prev">'+icon('chevL',15)+'</button>';
+    h += '<button class="icon-btn" data-action="cal-next">'+icon('chevR',15)+'</button>';
+    h += '</div></div>';
+    h += '<div class="cal-grid">';
+    ['Mo','Tu','We','Th','Fr','Sa','Su'].forEach(function(dow){ h += '<div class="cal-dow">'+dow+'</div>'; });
+    var today = todayISO();
+    cells.forEach(function(c){
+      var evs = eventsForDate(c.iso);
+      var cls = 'cal-cell'+(c.inMonth?'':' out')+(c.iso===today?' today':'')+(c.iso===state.selectedDate?' selected':'')+(evs.length?' has-events':'');
+      h += '<div class="'+cls+'" data-action="select-date" data-value="'+c.iso+'"><div class="cal-daynum tabular">'+c.day+'</div>';
+      if(evs.length){
+        h += '<div class="cal-events">';
+        evs.slice(0,3).forEach(function(e){
+          h += '<span class="cal-event-chip" style="background:'+dotSoft(e.kind)+';color:'+dotColor(e.kind)+';" title="'+esc(eventLabel(e))+'">'+esc(eventLabel(e))+'</span>';
+        });
+        if(evs.length>3) h += '<span class="cal-more">+'+(evs.length-3)+' more</span>';
+        h += '</div>';
+      }
+      h += '</div>';
+    });
+    h += '</div>';
+    h += legendDots();
+    h += buildAgenda(state.selectedDate);
+    return h;
+  }
+
+  function buildWeekView(){
+    var start = startOfWeek(state.calendarAnchor);
+    var h = '<div class="cal-head"><div class="cal-title">Week of '+fmtDateShort(start)+'</div><div class="cal-nav">';
+    h += '<button class="icon-btn" data-action="cal-prev">'+icon('chevL',15)+'</button>';
+    h += '<button class="icon-btn" data-action="cal-next">'+icon('chevR',15)+'</button>';
+    h += '</div></div>';
+    h += '<div class="week-cols">';
+    var today = todayISO();
+    for(var i=0;i<7;i++){
+      var iso = addDays(start,i);
+      var evs = eventsForDate(iso);
+      var dname = parseISO(iso).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',timeZone:'UTC'});
+      h += '<div class="week-col'+(iso===today?' today':'')+'" data-action="select-date" data-value="'+iso+'"><div class="week-col-head"><span>'+dname+'</span></div>';
+      if(!evs.length) h += '<div class="week-empty">No checkpoints</div>';
+      evs.forEach(function(e){
+        h += '<div class="agenda-item" style="padding:6px 0;"><span class="agenda-dot" style="background:'+dotColor(e.kind)+'"></span><div><div class="t1">'+esc(e.projectTitle)+'</div><div class="t2">'+esc(e.stepLabel)+'</div></div></div>';
+      });
+      h += '</div>';
+    }
+    h += '</div>';
+    h += legendDots();
+    return h;
+  }
+
+  function buildDayView(){
+    var iso = state.selectedDate;
+    var d = parseISO(iso);
+    var dname = d.toLocaleDateString('en-GB',{weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone:'UTC'});
+    var h = '<div class="cal-head"><div class="cal-title">'+dname+'</div><div class="cal-nav">';
+    h += '<button class="icon-btn" data-action="day-prev">'+icon('chevL',15)+'</button>';
+    h += '<button class="icon-btn" data-action="day-next">'+icon('chevR',15)+'</button>';
+    h += '</div></div>';
+    h += buildAgenda(iso, true);
+    return h;
+  }
+
+  function buildAgenda(iso, noHeadingWrap){
+    var evs = eventsForDate(iso);
+    var h = noHeadingWrap ? '' : '<div class="agenda-panel"><h3>'+fmtDate(iso)+'</h3>';
+    if(!noHeadingWrap && !evs.length) h += '<p class="helptext">No checkpoints on this date.</p>';
+    if(noHeadingWrap && !evs.length) h += '<div class="agenda-panel"><p class="helptext">No checkpoints on this date.</p></div>';
+    if(evs.length){
+      var wrap = noHeadingWrap ? '<div class="agenda-panel">' : '';
+      h += wrap;
+      evs.forEach(function(e){
+        h += '<div class="agenda-item" data-action="open-project" data-id="'+e.projectId+'" style="cursor:pointer;">';
+        h += '<span class="agenda-dot" style="background:'+dotColor(e.kind)+'"></span>';
+        var tag = e.kind==='done' ? ' &middot; signed by '+esc(e.name) : (e.kind==='deadline' ? '' : ' &middot; target date');
+        h += '<div><div class="t1">'+esc(e.projectTitle)+'</div><div class="t2">'+esc(e.stepLabel)+tag+'</div></div>';
+        h += '</div>';
+      });
+      if(noHeadingWrap) h += '</div>';
+    }
+    if(!noHeadingWrap) h += '</div>';
+    return h;
+  }
+
+  /* ---- Feedback ---- */
+  var FEEDBACK_CATS = [
+    {key:'idea', label:'Idea'},
+    {key:'bug', label:'Bug'},
+    {key:'question', label:'Question'}
+  ];
+  var FEEDBACK_STATUS_LABEL = {new:'New', planned:'Planned', done:'Done'};
+
+  function buildFeedback(){
+    var dr = state.draft;
+    var h = '<div class="feedback-intro"><h2>Testing the tracker?</h2><p>Tell the team what&#39;s confusing, missing, or broken. Ahmed reviews everything here to decide what to build next &mdash; no idea is too small.</p></div>';
+
+    h += '<div class="feedback-form">';
+    h += '<div class="field"><label>Your feedback</label><textarea id="fbMessage" data-draft="fbMessage" placeholder="What should we fix, add, or improve?">'+esc(dr.fbMessage||'')+'</textarea></div>';
+    h += '<div class="field-row">';
+    h += '<div class="field"><label>Type</label><select id="fbCategory" data-draft="fbCategory">';
+    FEEDBACK_CATS.forEach(function(c){ h += '<option value="'+c.key+'"'+((dr.fbCategory||'idea')===c.key?' selected':'')+'>'+c.label+'</option>'; });
+    h += '</select></div>';
+    h += '<div class="field"><label>Your name</label><input id="fbAuthor" type="text" list="peopleList" data-draft="fbAuthor" value="'+esc(dr.fbAuthor!=null?dr.fbAuthor:state.myName)+'"></div>';
+    h += '</div>';
+    h += '<div class="modal-actions"><button class="btn btn-primary" data-action="submit-feedback">'+icon('feedback',14)+' Send Feedback</button></div>';
+    h += '</div>';
+
+    if(state.feedbackLoading){
+      h += '<p class="helptext">Loading feedback&hellip;</p>';
+      return h;
+    }
+
+    if(!state.feedback.length){
+      h += '<div class="empty-wrap"><h2>No feedback yet</h2><p>Be the first to share a thought while you test the tracker.</p></div>';
+      return h;
+    }
+
+    h += '<div class="feedback-list">';
+    state.feedback.forEach(function(f){
+      var cat = FEEDBACK_CATS.find(function(c){ return c.key===f.category; }) || FEEDBACK_CATS[0];
+      h += '<div class="feedback-card">';
+      h += '<div class="feedback-msg">'+esc(f.message)+'</div>';
+      h += '<div class="feedback-meta">';
+      h += '<span class="feedback-cat feedback-cat-'+cat.key+'">'+cat.label+'</span>';
+      h += '<span>'+icon('user',11)+' '+esc(f.author||'Unknown')+'</span>';
+      h += '<span>&middot; '+fmtDate(f.createdAt)+'</span>';
+      h += '<button class="feedback-status feedback-status-'+(f.status||'new')+'" data-action="cycle-feedback" data-id="'+f.id+'" title="Click to change status">'+(FEEDBACK_STATUS_LABEL[f.status]||'New')+'</button>';
+      h += '<button class="chip-sm" data-action="delete-feedback" data-id="'+f.id+'" style="margin-left:auto;">'+icon('trash',11)+'</button>';
+      h += '</div>';
+      if(f._syncFailed) h += '<div class="feedback-cat feedback-cat-bug" style="display:inline-block;width:fit-content;">'+icon('x',10)+' Not saved to team tracker</div>';
+      h += '</div>';
+    });
+    h += '</div>';
+    return h;
+  }
+
+  /* ---- Modals ---- */
+  function buildNewProjectModal(){
+    var dr = state.draft;
+    var cat = dr.npCategory || 'Government';
+    var h = '<div class="modal-overlay" data-action="close-modal-bg" data-which="new">';
+    h += '<div class="modal">';
+    h += '<div class="modal-head"><h2>New Project</h2><button class="icon-btn" data-action="close-new-project">'+icon('x',15)+'</button></div>';
+    h += '<div class="field"><label>Project Title</label><input id="npTitle" type="text" data-draft="npTitle" placeholder="e.g. National Preparedness Film" value="'+esc(dr.npTitle||'')+'"></div>';
+    h += '<div class="field"><label>Category</label><div class="seg">';
+    h += '<button type="button" class="'+(cat==='Government'?'on':'')+'" data-action="set-cat" data-value="Government">Government</button>';
+    h += '<button type="button" class="'+(cat==='Semi-Government'?'on':'')+'" data-action="set-cat" data-value="Semi-Government">Semi-Government</button>';
+    h += '</div></div>';
+    h += '<div class="field"><label>Entity</label><input id="npEntity" type="text" list="entityList" data-draft="npEntity" placeholder="e.g. Civil Defence" value="'+esc(dr.npEntity||'')+'"></div>';
+    h += '<div class="field"><label>Type</label>'+buildTypeChips(dr.npType||TYPES[0], 'set-type')+'</div>';
+    h += '<div class="field-row">';
+    h += '<div class="field"><label>Format</label><select id="npFormat" data-draft="npFormat">';
+    FORMATS.forEach(function(f){ h += '<option value="'+f+'"'+((dr.npFormat||FORMATS[0])===f?' selected':'')+'>'+f+'</option>'; });
+    h += '</select></div>';
+    h += '<div class="field"><label>Deadline (optional)</label><input id="npDeadline" type="date" data-draft="npDeadline" value="'+esc(dr.npDeadline||'')+'"></div>';
+    h += '</div>';
+    h += '<div class="field"><label>Description</label><textarea id="npDescription" data-draft="npDescription" placeholder="What is this project about? Angle, key message, who it features&hellip;">'+esc(dr.npDescription||'')+'</textarea></div>';
+    h += '<div class="field"><label>Created by</label><input id="npCreator" type="text" data-draft="npCreator" value="'+esc(dr.npCreator!=null?dr.npCreator:state.myName)+'"></div>';
+    h += '<p class="helptext">The project starts at Ideation with all 11 checkpoints ahead of it.</p>';
+    h += '<div class="modal-actions"><button class="btn" data-action="close-new-project">Cancel</button><button class="btn btn-primary" data-action="submit-new-project">Create Project</button></div>';
+    h += '</div></div>';
+    h += '<datalist id="entityList">'+ENTITIES.map(function(e){ return '<option value="'+esc(e)+'">'; }).join('')+'</datalist>';
+    return h;
+  }
+
+  function buildNameGateModal(){
+    var isEdit = state.nameGateMode==='edit';
+    var h = '<div class="modal-overlay">';
+    h += '<div class="modal">';
+    h += '<div class="modal-head"><h2>'+(isEdit?'Update your name':'Welcome')+'</h2>'+(isEdit?'<button class="icon-btn" data-action="close-name-gate">'+icon('x',15)+'</button>':'')+'</div>';
+    if(!isEdit) h += '<p class="helptext">Enter your name so updates you make to a project are signed correctly. This is just for attribution &mdash; no password needed.</p>';
+    h += '<div class="field"><label>Your name</label><input id="nameGateInput" type="text" list="peopleList" data-draft="nameGateValue" placeholder="e.g. Ahmed Hassan" value="'+esc(state.draft.nameGateValue!=null?state.draft.nameGateValue:state.myName)+'"></div>';
+    h += '<div class="modal-actions"><button class="btn btn-primary" data-action="submit-name">'+(isEdit?'Save':'Continue')+'</button></div>';
+    h += '</div></div>';
+    return h;
+  }
+
+  var peopleListHTML = '<datalist id="peopleList">'+KNOWN_PEOPLE.map(function(n){ return '<option value="'+esc(n)+'">'; }).join('')+'</datalist>';
+
+  /* ---------------- events ---------------- */
+  function setDraft(k,v){ state.draft[k]=v; }
+
+  document.addEventListener('input', function(e){
+    var t = e.target;
+    if(t && t.dataset && t.dataset.draft){
+      setDraft(t.dataset.draft, t.value);
+      if(t.dataset.draft==='search'){ state.search = t.value; render(); }
+    }
+  });
+
+  document.addEventListener('click', function(e){
+    var el = e.target.closest('[data-action]');
+    if(!el) return;
+    if(e.target.closest('[data-stop]') && el.closest('[data-stop]') && el.dataset.action!=='complete-step' && el.dataset.action!=='save-target' && el.dataset.action!=='reopen-step' && el.dataset.action!=='fill-name'){
+      // allow inner clicks inside form without bubbling weirdness; explicit actions still handled below
+    }
+    var action = el.dataset.action;
+    switch(action){
+      case 'go-dashboard': state.view='dashboard'; state.selectedProjectId=null; state.editingStepKey=null; render(); break;
+      case 'go-feedback': state.view='feedback'; render(); break;
+      case 'open-project':
+        e.stopPropagation();
+        state.selectedProjectId = el.dataset.id; state.view='project'; state.editingStepKey=null; state.draft={};
+        render(); break;
+      case 'new-project': state.showNewProject=true; state.draft={}; render(); break;
+      case 'close-new-project': state.showNewProject=false; state.draft={}; render(); break;
+      case 'close-modal-bg': if(e.target===el){ state.showNewProject=false; render(); } break;
+      case 'set-cat': setDraft('npCategory', el.dataset.value); render(); break;
+      case 'set-type': setDraft('npType', el.dataset.value); render(); break;
+      case 'submit-new-project': submitNewProject(); break;
+      case 'filter-cat': state.filterCategory = el.dataset.value; render(); break;
+      case 'filter-type': state.filterType = el.dataset.value; render(); break;
+      case 'filter-status': state.filterStatus = el.dataset.value; render(); break;
+      case 'edit-name': state.showNameGate=true; state.nameGateMode='edit'; state.draft.nameGateValue=state.myName; render(); break;
+      case 'close-name-gate': if(state.myName){ state.showNameGate=false; render(); } break;
+      case 'submit-name': submitName(); break;
+      case 'toggle-step':
+        e.stopPropagation();
+        var key = el.dataset.key;
+        if(state.editingStepKey===key){ state.editingStepKey=null; } else { state.editingStepKey=key; state.draft={}; }
+        render(); break;
+      case 'fill-name':
+        e.stopPropagation();
+        setDraft('stepName', el.dataset.value);
+        var inp = document.getElementById('stepName'); if(inp) inp.value = el.dataset.value;
+        render(); break;
+      case 'complete-step': e.stopPropagation(); submitStep(el.dataset.project, el.dataset.key, true); break;
+      case 'save-target': e.stopPropagation(); submitStep(el.dataset.project, el.dataset.key, false); break;
+      case 'reopen-step':
+        e.stopPropagation();
+        patchStep(el.dataset.project, el.dataset.key, {status:'pending', completedDate:null, completedBy:null});
+        state.editingStepKey=null; break;
+      case 'delete-project': e.stopPropagation(); deleteProject(el.dataset.id); break;
+      case 'submit-feedback': submitFeedback(); break;
+      case 'cycle-feedback': e.stopPropagation(); cycleFeedbackStatus(el.dataset.id); break;
+      case 'delete-feedback': e.stopPropagation(); deleteFeedback(el.dataset.id); break;
+      case 'toggle-deadline':
+        e.stopPropagation();
+        state.editingDeadline = state.editingDeadline===el.dataset.id ? null : el.dataset.id;
+        render(); break;
+      case 'save-deadline':
+        e.stopPropagation();
+        var dlVal = fieldVal('deadlineInput', null) || null;
+        patchProject(el.dataset.id, {deadline: dlVal});
+        state.editingDeadline = null; break;
+      case 'clear-deadline':
+        e.stopPropagation();
+        patchProject(el.dataset.id, {deadline: null});
+        state.editingDeadline = null; break;
+      case 'cal-view': state.calendarView = el.dataset.value; render(); break;
+      case 'cal-today': state.calendarAnchor=todayISO(); state.selectedDate=todayISO(); render(); break;
+      case 'cal-prev':
+        if(state.calendarView==='month') state.calendarAnchor = addMonths(state.calendarAnchor,-1);
+        else state.calendarAnchor = addDays(state.calendarAnchor,-7);
+        render(); break;
+      case 'cal-next':
+        if(state.calendarView==='month') state.calendarAnchor = addMonths(state.calendarAnchor,1);
+        else state.calendarAnchor = addDays(state.calendarAnchor,7);
+        render(); break;
+      case 'day-prev': state.selectedDate = addDays(state.selectedDate,-1); render(); break;
+      case 'day-next': state.selectedDate = addDays(state.selectedDate,1); render(); break;
+      case 'select-date': state.selectedDate = el.dataset.value; render(); break;
+      case 'retry-sync':
+        state.loading = false;
+        state.syncDegraded = false;
+        render();
+        subscribeProjects();
+        subscribeFeedback();
+        break;
+    }
+  });
+
+  function submitNewProject(){
+    var title = fieldVal('npTitle', state.draft.npTitle).trim();
+    if(!title){ showNotice('Please enter a project title'); return; }
+    var data = {
+      title:title, category: state.draft.npCategory||'Government', entity:fieldVal('npEntity','').trim(),
+      type: state.draft.npType||TYPES[0],
+      format: fieldVal('npFormat', FORMATS[0]), description: fieldVal('npDescription','').trim(),
+      deadline: fieldVal('npDeadline', null) || null,
+      createdBy: fieldVal('npCreator', state.myName).trim() || 'Unknown'
+    };
+    state.showNewProject=false; state.draft={};
+    createProject(data);
+  }
+
+  function submitFeedback(){
+    var message = fieldVal('fbMessage', state.draft.fbMessage).trim();
+    if(!message){ showNotice('Please write your feedback first'); return; }
+    var data = {
+      message:message, category: fieldVal('fbCategory','idea'),
+      author: fieldVal('fbAuthor', state.myName).trim() || 'Unknown'
+    };
+    state.draft.fbMessage=''; state.draft.fbCategory='';
+    createFeedback(data);
+  }
+
+  function fieldVal(id, fallback){
+    var el = document.getElementById(id);
+    var v = el ? el.value : '';
+    return (v!=null && v!=='') ? v : (fallback!=null ? fallback : '');
+  }
+
+  function submitName(){
+    var v = fieldVal('nameGateInput', state.draft.nameGateValue).trim();
+    if(!v) return;
+    state.myName = v;
+    try{ localStorage.setItem('gco_tracker_name', v); }catch(e){}
+    state.showNameGate=false; state.draft={};
+    render();
+  }
+
+  function submitStep(projectId, key, complete){
+    var planned = fieldVal('stepPlanned', null) || null;
+    var completed = fieldVal('stepCompleted', todayISO());
+    var name = fieldVal('stepName', state.myName).trim();
+    var note = fieldVal('stepNote', '').trim();
+    if(complete && !name){ showNotice('Please enter who is signing off this step'); return; }
+    var patch = complete
+      ? {status:'done', completedDate:completed, completedBy:name, plannedDate:planned, note:note}
+      : {plannedDate:planned, note:note};
+    patchStep(projectId, key, patch);
+    state.editingStepKey=null; state.draft={};
+  }
+
+  /* ---------------- boot ---------------- */
+  async function boot(){
+    var cachedProjects = loadCache('gco_tracker_projects_v1');
+    if(cachedProjects && cachedProjects.length){ state.projects = cachedProjects; state.loading = false; }
+    var cachedFeedback = loadCache('gco_tracker_feedback_v1');
+    if(cachedFeedback && cachedFeedback.length){ state.feedback = cachedFeedback; state.feedbackLoading = false; }
+    render();
+    try{
+      if(window.firebase && FIREBASE_CONFIG && FIREBASE_CONFIG.apiKey !== 'REPLACE_ME'){
+        firebase.initializeApp(FIREBASE_CONFIG);
+        db = firebase.firestore();
+        try{ await db.enablePersistence({synchronizeTabs:true}); }catch(e){}
+      }
+    }catch(e){ db=null; showNotice('Firebase setup looks incomplete &mdash; see the comment near the top of this file'); }
+    state.connectAttempted = true;
+    subscribeProjects();
+    subscribeFeedback();
+  }
+
+  document.body.insertAdjacentHTML('beforeend', peopleListHTML);
+  boot();
+})();
+</script>
+</body>
+</html>
